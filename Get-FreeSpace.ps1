@@ -1,20 +1,25 @@
-# Parameters
+﻿# Parameters
 param (
-    [switch]$Force,
-    [switch]$NoDisplay
+    [string]$ForceClean,
+    [string]$NoDisplay
 )
 
+
 # Define function to calculate folder size
-function Get-FolderSize {
+function Get-FolderSize
+{
     param (
         [string]$Path
     )
     $totalSize = 0
-
-    if (Test-Path $Path) {
+    
+    if (Test-Path $Path)
+    {
         $items = Get-ChildItem -Path $Path -Recurse -ErrorAction SilentlyContinue
-        foreach ($item in $items) {
-            if ($item -is [System.IO.FileInfo]) {
+        foreach ($item in $items)
+        {
+            if ($item -is [System.IO.FileInfo])
+            {
                 $totalSize += $item.Length
             }
         }
@@ -23,13 +28,15 @@ function Get-FolderSize {
 }
 
 # Define function to convert size to human-readable format
-function Convert-Size {
+function Convert-Size
+{
     param (
         [int64]$Size
     )
     $sizes = "B", "KB", "MB", "GB", "TB"
     $order = 0
-    while ($Size -ge 1024 -and $order -lt $sizes.Length - 1) {
+    while ($Size -ge 1024 -and $order -lt $sizes.Length - 1)
+    {
         $order++
         $Size = [math]::Round($Size / 1024, 2)
     }
@@ -37,28 +44,41 @@ function Convert-Size {
 }
 
 # Define function to delete folder contents
-function Delete-FolderContents {
+function Delete-FolderContents
+{
     param (
         [string]$Path,
         [switch]$Force
     )
-
-    if ($Force) {
+    
+    if ($Force)
+    {
         Get-ChildItem -Path $Path -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-    } else {
+    }
+    else
+    {
         Get-ChildItem -Path $Path -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -ErrorAction SilentlyContinue
     }
 }
 
-# Define paths
-$paths = @(
-    "C:\Users\*\AppData\Local\Autodesk\Revit\*Revit*202*\Journals\",
-    "C:\Users\*\AppData\Local\Autodesk\Revit\*Revit*202*\CollaborationCache\",
-    "C:\Users\*\AppData\Local\Autodesk\Revit\*Revit*202*\CefCache\",
-    "C:\Users\*\AppData\Local\Autodesk\Revit\PacCache\",
-    "C:\Autodesk\",
-    "C:\Users\*\AppData\Local\Temp\"
-)
+
+# Fetch path list from open source repo
+$PublicList = "https://github.com/DailenG/FreespacePaths/raw/main/paths.json"
+
+Write-output "Loading list from $PublicList"
+try
+{
+    $pathsRaw = Invoke-WebRequest $PublicList -UseBasicParsing
+}
+catch
+{
+    Write-Error "Unable to load list from $PublicList"
+}
+
+
+# $pathsRaw = Get-Content $PSScriptRoot\paths.json
+$paths = ($pathsRaw | ConvertFrom-Json).cleanup_paths.path
+
 
 # Add C:\Windows\Temp as a single entry
 $windowsTempPath = "C:\Windows\Temp\"
@@ -70,9 +90,11 @@ $pathSizes = @()
 Write-Output "Please wait...Finding potential free space..."
 
 # Calculate total size and store individual path sizes
-foreach ($path in $paths) {
+foreach ($path in $paths)
+{
     $expandedPaths = Get-ChildItem -Path $path -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-    foreach ($expandedPath in $expandedPaths) {
+    foreach ($expandedPath in $expandedPaths)
+    {
         $folderSize = Get-FolderSize -Path $expandedPath
         $totalSize += $folderSize
         $humanReadableSize = Convert-Size -Size $folderSize
@@ -96,9 +118,9 @@ $totalHumanReadableSize = Convert-Size -Size $totalSize
 
 # Add dummy entry for "All Paths"
 $pathSizes = ,([PSCustomObject]@{
-    'Path' = "All Paths"
-    'Size' = $totalHumanReadableSize
-}) + $pathSizes
+        'Path' = "All Paths"
+        'Size' = $totalHumanReadableSize
+    }) + $pathSizes
 
 # Display the sizes in a table
 $pathSizes | Format-Table -AutoSize
@@ -106,40 +128,52 @@ $pathSizes | Format-Table -AutoSize
 Write-Host "Total size capable of being freed: $totalHumanReadableSize"
 
 # User selection via Out-GridView or prompt in terminal
-if (-not $Force) {
-    if ($NoDisplay) {
+if ($ForceClean -ne "True")
+{
+    if ($NoDisplay -eq "True")
+    {
         $response = Read-Host "Do you want to remove the contents of all these locations? (Y/N)"
-        if ($response -ne "Y") {
+        if ($response -ne "Y")
+        {
             Write-Host "Aborted."
             return
         }
-        $pathsToDelete = $pathSizes.Path[1..($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
-    } else {
+        $pathsToDelete = $pathSizes.Path[1 .. ($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
+    }
+    else
+    {
         $gridViewTitle = "CTRL-Click to select the ones you want to empty - Total Space: $totalHumanReadableSize"
         $selectedPaths = $pathSizes | Out-GridView -Title $gridViewTitle -OutputMode Multiple
-
-        if ($null -eq $selectedPaths) {
+        
+        if ($null -eq $selectedPaths)
+        {
             Write-Host "No paths selected. Aborted."
             return
         }
-        if ($selectedPaths.Path -contains "All Paths" -or $selectedPaths.Count -eq 0) {
-            $pathsToDelete = $pathSizes.Path[1..($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
-        } else {
+        if ($selectedPaths.Path -contains "All Paths" -or $selectedPaths.Count -eq 0)
+        {
+            $pathsToDelete = $pathSizes.Path[1 .. ($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
+        }
+        else
+        {
             $pathsToDelete = $selectedPaths.Path
         }
     }
-} else {
+}
+else
+{
     # Force deletion, include all paths
-    $pathsToDelete = $pathSizes.Path[1..($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
+    $pathsToDelete = $pathSizes.Path[1 .. ($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
 }
 
 $freedSize = 0
 
 # Delete contents and calculate freed size
-foreach ($path in $pathsToDelete) {
+foreach ($path in $pathsToDelete)
+{
     Write-Host "Deleting contents of $path"
     $sizeBefore = Get-FolderSize -Path $path
-    Delete-FolderContents -Path $path -Force:$Force
+    Delete-FolderContents -Path $path -Force
     $sizeAfter = Get-FolderSize -Path $path
     $freedSize += ($sizeBefore - $sizeAfter)
 }
@@ -153,3 +187,4 @@ Add-Type -AssemblyName PresentationFramework
 
 Write-Host "Freed space: $humanReadableFreedSize"
 Write-Host "Completed."
+    
