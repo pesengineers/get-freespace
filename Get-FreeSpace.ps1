@@ -178,12 +178,18 @@ foreach ($path in $pathsToDelete)
     $freedSize += ($sizeBefore - $sizeAfter)
 }
 
+# If we calculate a negative number for some reason, lets just set the space freed to zero
+if ($freedSize -lt 0)
+{
+    $freedSize = 0
+}
+
 # Convert freed size to human-readable format
 $humanReadableFreedSize = Convert-Size -Size $freedSize
 
 # Display popup with freed size
 Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("Freed space: $humanReadableFreedSize", "Space Freed", "OK", "Information")
+[System.Windows.MessageBox]::Show("Actual freed space: $humanReadableFreedSize", "Space Freed", "OK", "Information")
 
 Write-Host "Freed space: $humanReadableFreedSize"
 Write-Host "Completed."
