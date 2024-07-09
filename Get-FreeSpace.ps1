@@ -125,7 +125,7 @@ $pathSizes = ,([PSCustomObject]@{
 # Display the sizes in a table
 $pathSizes | Format-Table -AutoSize
 
-Write-Host "Total size capable of being freed: $totalHumanReadableSize"
+Write-Output "Total size capable of being freed: $totalHumanReadableSize"
 
 # User selection via Out-GridView or prompt in terminal
 if (-Not($Force))
@@ -135,7 +135,7 @@ if (-Not($Force))
         $response = Read-Host "Do you want to remove the contents of all these locations? (Y/N)"
         if ($response -ne "Y")
         {
-            Write-Host "Aborted."
+            Write-Output "Aborted."
             return
         }
         $pathsToDelete = $pathSizes.Path[1 .. ($pathSizes.Count - 1)] # Exclude dummy "All Paths" entry
@@ -147,7 +147,7 @@ if (-Not($Force))
         
         if ($null -eq $selectedPaths)
         {
-            Write-Host "No paths selected. Aborted."
+            Write-Output "No paths selected. Aborted."
             return
         }
         if ($selectedPaths.Path -contains "All Paths" -or $selectedPaths.Count -eq 0)
@@ -171,7 +171,7 @@ $freedSize = 0
 # Delete contents and calculate freed size
 foreach ($path in $pathsToDelete)
 {
-    Write-Host "Deleting contents of $path"
+    Write-Output "Deleting contents of $path"
     $sizeBefore = Get-FolderSize -Path $path
     Delete-FolderContents -Path $path -Force
     $sizeAfter = Get-FolderSize -Path $path
@@ -187,10 +187,16 @@ if ($freedSize -lt 0)
 # Convert freed size to human-readable format
 $humanReadableFreedSize = Convert-Size -Size $freedSize
 
-# Display popup with freed size
-Add-Type -AssemblyName PresentationFramework
-[System.Windows.MessageBox]::Show("Actual freed space: $humanReadableFreedSize", "Space Freed", "OK", "Information")
+if (-Not($Force))
+{
+    if(-Not($NoDisplay))
+    {
+        # Display popup with freed size
+        Add-Type -AssemblyName PresentationFramework
+        [System.Windows.MessageBox]::Show("Actual freed space: $humanReadableFreedSize", "Space Freed", "OK", "Information")
+    }
+}
 
-Write-Host "Freed space: $humanReadableFreedSize"
-Write-Host "Completed."
+Write-Output "Freed space: $humanReadableFreedSize"
+Write-Output "Completed."
     
