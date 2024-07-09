@@ -1,7 +1,7 @@
 ﻿# Parameters
 param (
-    [string]$ForceClean,
-    [string]$NoDisplay
+    [switch]$Force,
+    [switch]$NoDisplay
 )
 
 
@@ -128,9 +128,9 @@ $pathSizes | Format-Table -AutoSize
 Write-Host "Total size capable of being freed: $totalHumanReadableSize"
 
 # User selection via Out-GridView or prompt in terminal
-if ($ForceClean -ne "True")
+if (-Not($Force))
 {
-    if ($NoDisplay -eq "True")
+    if ($NoDisplay)
     {
         $response = Read-Host "Do you want to remove the contents of all these locations? (Y/N)"
         if ($response -ne "Y")
