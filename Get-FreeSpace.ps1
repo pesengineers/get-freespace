@@ -1,7 +1,8 @@
 ﻿# Parameters
 param (
     [switch]$Force,
-    [switch]$NoDisplay
+    [switch]$NoDisplay,
+    [string]$Source="https://raw.githubusercontent.com/DailenG/FreespacePaths/main/paths.json"
 )
 
 
@@ -44,7 +45,7 @@ function Convert-Size
 }
 
 # Define function to delete folder contents
-function Delete-FolderContents
+function Remove-FolderContents
 {
     param (
         [string]$Path,
@@ -61,18 +62,14 @@ function Delete-FolderContents
     }
 }
 
-
-# Fetch path list from open source repo
-$PublicList = "https://github.com/DailenG/FreespacePaths/raw/DailenG-aged-paths/paths.json"
-
-Write-output "Loading list from $PublicList"
+Write-output "Loading list from $Source"
 try
 {
-    $pathsRaw = Invoke-WebRequest $PublicList -UseBasicParsing
+    $pathsRaw = Invoke-WebRequest $Source -UseBasicParsing
 }
 catch
 {
-    Write-Error "Unable to load list from $PublicList"
+    Write-Error "Unable to load list from $Source"
 }
 
 
@@ -175,7 +172,7 @@ foreach ($path in $pathsToDelete)
 {
     Write-Output "Deleting contents of $path"
     $sizeBefore = Get-FolderSize -Path $path
-    Delete-FolderContents -Path $path -Force
+    Remove-FolderContents -Path $path -Force
     $sizeAfter = Get-FolderSize -Path $path
     $freedSize += ($sizeBefore - $sizeAfter)
 }
