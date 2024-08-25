@@ -2,7 +2,7 @@
 param (
     [switch]$Force,
     [switch]$NoDisplay,
-    [string]$Source="https://raw.githubusercontent.com/DailenG/FreespacePaths/main/paths.json"
+    [string]$Source="https://raw.githubusercontent.com/pesengineers/FreespacePaths/main/paths.json"
 )
 
 
