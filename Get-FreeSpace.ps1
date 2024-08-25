@@ -63,7 +63,7 @@ function Delete-FolderContents
 
 
 # Fetch path list from open source repo
-$PublicList = "https://github.com/DailenG/FreespacePaths/raw/main/paths.json"
+$PublicList = "https://github.com/DailenG/FreespacePaths/raw/DailenG-aged-paths/paths.json"
 
 Write-output "Loading list from $PublicList"
 try
@@ -77,7 +77,7 @@ catch
 
 
 # $pathsRaw = Get-Content $PSScriptRoot\paths.json
-$paths = ($pathsRaw | ConvertFrom-Json).cleanup_paths.path
+$paths = ($pathsRaw | ConvertFrom-Json).cleanup_paths
 
 
 # Add C:\Windows\Temp as a single entry
@@ -92,7 +92,9 @@ Write-Output "Please wait...Finding potential free space..."
 # Calculate total size and store individual path sizes
 foreach ($path in $paths)
 {
-    $expandedPaths = Get-ChildItem -Path $path -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+    $exclusionDate = (Get-Date).AddDays(-$path.aged)
+    $expandedPaths = Get-ChildItem -Path $path.path -Directory -ErrorAction SilentlyContinue | Where-Object { $_.LastAccessTime -lt $exclusionDate }
+    
     foreach ($expandedPath in $expandedPaths)
     {
         $folderSize = Get-FolderSize -Path $expandedPath
