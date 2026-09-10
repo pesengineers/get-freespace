@@ -1,0 +1,46 @@
+{
+  "cleanup_paths": [
+    {
+      "name": "Revit Journals",
+      "path": "C:\\Users\\*\\AppData\\Local\\Autodesk\\Revit\\*Revit*202*\\Journals\\",
+      "description": "Revit journal files for all users and 202x versions",
+      "retain_days": 7,
+      "scope": "file"
+    },
+    {
+      "name": "Revit Collaboration Cache",
+      "path": "C:\\Users\\*\\AppData\\Local\\Autodesk\\Revit\\*Revit*202*\\CollaborationCache\\",
+      "description": "Revit collaboration cache files for all users and 202x versions",
+      "retain_days": 7,
+      "scope": "folder"
+    },
+    {
+      "name": "Revit CEF Cache",
+      "path": "C:\\Users\\*\\AppData\\Local\\Autodesk\\Revit\\*Revit*202*\\CefCache\\",
+      "description": "Revit Chromium Embedded Framework cache for all users and 202x versions",
+      "retain_days": 0,
+      "scope": "file"
+    },
+    {
+      "name": "Revit PAC Cache",
+      "path": "C:\\Users\\*\\AppData\\Local\\Autodesk\\Revit\\PacCache\\",
+      "description": "Revit PAC (Product Asset Cache) for all users",
+      "retain_days": 0,
+      "scope": "file"
+    },
+    {
+      "name": "Autodesk Root",
+      "path": "C:\\Autodesk\\",
+      "description": "Root Autodesk folder, likely containing various product files and installers",
+      "retain_days": 0,
+      "scope": "folder"
+    },
+    {
+      "name": "User Temp",
+      "path": "C:\\Users\\*\\AppData\\Local\\Temp\\",
+      "description": "Windows temporary files for all users",
+      "retain_days": 1,
+      "scope": "file"
+    }
+  ]
+}
