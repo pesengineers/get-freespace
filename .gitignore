@@ -1,26 +1,13 @@
-# SAPIEN PowerShell Studio scratch
-*.TempPoint.*
-*.RestorePoint.*
-*.Export.*
-*.psprojs
-*.Run.ps1
-*.Package.ps1
-CustomMenu.inf
-
 # Build output
-Builds/
+out/
 bin/
 obj/
 *.exe
 *.msi
 *.sha256
-*.install.log
 
 # Editor / OS
 .vs/
 .vscode/
 Thumbs.db
 desktop.ini
-
-# Local-only archive of recovered PowerShell Studio material and shipped binaries
-legacy/

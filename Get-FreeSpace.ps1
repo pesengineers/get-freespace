@@ -1,8 +1,7 @@
 #Requires -Version 5.1
 <#
     .SYNOPSIS
-        Command line entry point for Get-FreeSpace. This is the file that gets packaged
-        into get-freespace.exe and the MSI.
+        Command line entry point for Get-FreeSpace.
 
     .DESCRIPTION
         Thin wrapper over the module that sits beside it. All behavior lives in

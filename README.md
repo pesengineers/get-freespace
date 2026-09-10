@@ -114,19 +114,19 @@ files reduce the number instead of inflating it.
 
 | Path | What it is |
 | --- | --- |
-| `Get-FreeSpace.ps1` | CLI entry point, the file that gets packaged into the exe and MSI. Thin wrapper over the module. |
+| `Get-FreeSpace.ps1` | CLI entry point. Thin wrapper over the module. |
 | `Get-FreeSpace.psd1` / `.psm1` | Module manifest and loader. |
 | `Public/`, `Private/` | Module functions. |
 | `Tests/` | Pester 5 suite; passes on Windows PowerShell 5.1 and PowerShell 7. |
 | `paths.json` | Cleanup list snapshot and offline fallback. |
-| `get-freespace.ps1.psbuild`, `get_freespace.ico` | SAPIEN packaging settings and icon. |
-| `docs/BUILD.md` | Packaging identity: GUIDs, versions, engine, installer settings. |
-| `legacy/` | Local-only archive (gitignored, never published). |
+| `get_freespace.ico` | Application icon, for whatever packager you use. |
+| `docs/DISTRIBUTION.md` | How to ship it: module publish, optional exe, installer identity. |
 
 ## Compatibility
 
-Windows PowerShell 5.1 and PowerShell 7. The packaged exe/MSI is still built on the
-Windows PowerShell engine; see [`docs/BUILD.md`](docs/BUILD.md).
+Windows PowerShell 5.1 and PowerShell 7, verified by the test suite on both. There is no
+build step and no IDE dependency; see [`docs/DISTRIBUTION.md`](docs/DISTRIBUTION.md) to
+publish or package it.
 
 ## Author
 

@@ -2,13 +2,11 @@
 
 ## Provenance
 
-Consolidated 2026-09-09 from the GitHub repo (authoritative, newest) plus files scattered
-across the SAPIEN PowerShell Studio workspace at
-`C:\Syncs\Resilio\Code\Local\PowerShell Studio` (`Projects\`, `Files\`, `Builds\`).
-The scattered `get-freespace.ps1` there matched commit `e02b1d9` exactly, so no source was
-lost. The only unique recovery was the unfinished module rewrite. Those workspace folders
-have since been deleted; everything salvaged that does not belong in a public repo lives
-in `legacy/`, which is gitignored. Build/installer identity is in `docs/BUILD.md`.
+Consolidated 2026-09-09 from the GitHub repo plus files scattered across an old SAPIEN
+PowerShell Studio workspace. That workspace is deleted, the `.psbuild` project settings
+are gone, and 2.0.0 superseded the unfinished module rewrite that was the only unique
+salvage. Nothing in this repo depends on PowerShell Studio any more; see
+`docs/DISTRIBUTION.md` for how it ships now.
 
 ## Downstream fork
 
@@ -30,9 +28,9 @@ kept green on both. Two surfaces used to pin it to 5.1 and are now abstracted:
 - Completion popup: `Show-FSCompletionPopup` degrades to console output when
   `PresentationFramework` cannot be loaded.
 
-The packaged exe/MSI is still built on the Windows PowerShell engine. Commit `7332b3b`
-reverted a PS7 packaging attempt in 2024; the blockers above are gone, but re-test the
-SAPIEN PS7 host before switching, since that host is what actually failed.
+Distribution no longer involves a proprietary build host. See `docs/DISTRIBUTION.md`.
+Commit `7332b3b` reverted a PS7 packaging attempt in 2024 because of the two surfaces
+above; that reason no longer holds.
 
 ## Cleanup list is a separate repo
 
@@ -74,15 +72,13 @@ are read for months without being rewritten.
 - Failures are collected and reported per run, but there is no retry for files locked by a
   running Revit.
 
-## Packaging
+## Distribution
 
-Read `docs/BUILD.md` before touching packaging. The MSI ProductGUID/UpgradeGUID must stay
-stable so existing installs upgrade rather than side-install.
-
-`Get-FreeSpace.ps1` is now a wrapper that imports the module beside it, so the packaged
-payload must include `Get-FreeSpace.psd1`, `Get-FreeSpace.psm1`, `Public\`, `Private\` and
-`paths.json`. A build that ships only the exe will fail at startup with "module not found
-next to this script".
+Read `docs/DISTRIBUTION.md`. Ship as a module via `Publish-PSResource`; `Publish-Module`
+fails on this machine with a dotnet pack error. If a binary is ever rebuilt, the payload
+must include `Get-FreeSpace.psd1`, `Get-FreeSpace.psm1`, `Public\`, `Private\` and
+`paths.json` beside the wrapper, and reuse the recorded MSI GUIDs so existing installs
+upgrade rather than side-install.
 
 ## Commit style
 
